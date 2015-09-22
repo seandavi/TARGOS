@@ -1,0 +1,12 @@
+Package: TARGOS
+Title: Utility package for TARGET Osteosarcoma data
+Version: 0.0.0.9000
+Authors@R: person("Sean", "Davis", email = "seandavi@gmail.com", role = c("aut", "cre"))
+Description: Loaders and analysis for TARGET Osteosarcoma
+Depends: R (>= 3.2.1)
+License: MIT
+LazyData: true
+NeedsCompilation: no
+Packaged: 2015-09-22 02:33:39 UTC; sdavis2
+Author: Sean Davis [aut, cre]
+Maintainer: Sean Davis <seandavi@gmail.com>

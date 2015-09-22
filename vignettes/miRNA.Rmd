@@ -1,0 +1,29 @@
+---
+title: "miRNA.html"
+author: "Sean Davis"
+date: "9/21/2015"
+output: html_document
+---
+
+```{r init}
+library(knitr)
+opts_chunk$set(cache=TRUE,warning=FALSE,message=FALSE)
+```
+
+```{r loadPackage}
+#require(TARGOS)
+options('DCC' = '/data/CCRBioinfo/projects/TargetOsteosarcoma/OtherData/DCC')
+mirna = getmiRNA()
+coxphPval = sapply(seq_len(nrow(mirna)),function(i) {
+  return(summary(with(pData(mirna),coxph(Surv(Overall.Survival.Time.in.Days,as.numeric(Vital.Status.=='Dead')) ~ exprs(mirna)[i,])))$waldtest['pvalue'])
+  })
+coxphFDR = p.adjust(coxphPval)
+```
+
+```{r results,cache=FALSE}
+library(DT)
+df = data.frame(mirna = featureNames(mirna),
+                     pval = coxphPval, 
+                     fdr = coxphFDR)
+datatable(df[!is.na(df$fdr),])
+```
