@@ -9,6 +9,7 @@ output: html_document
 library(knitr)
 library(Biobase)
 library(survival)
+library(DT)
 opts_chunk$set(cache=TRUE,warning=FALSE,message=FALSE)
 ```
 
@@ -16,11 +17,29 @@ opts_chunk$set(cache=TRUE,warning=FALSE,message=FALSE)
 #require(TARGOS)
 options('DCC' = '/data/CCRBioinfo/projects/TargetOsteosarcoma/OtherData/DCC')
 mirna = getmiRNA()
+```
+
+```{r metastasisAtPresentation,cache=FALSE}
+library(limma)
+met = factor(ifelse(pData(mirna)$Disease.at.diagnosis=='Metastatic',"Yes","No"))
+dm = model.matrix(~0 + met)
+cm = makeContrasts(metYes-metNo,levels=dm)
+fit1 = lmFit(exprs(mirna),dm)
+fit2 = contrasts.fit(fit1,cm)
+fit3 = eBayes(fit2)
+datatable(topTable(fit3,number=Inf))
+```
+
+
+```{r coxph}
 coxphPval = sapply(seq_len(nrow(mirna)),function(i) {
   return(summary(with(pData(mirna),coxph(Surv(Overall.Survival.Time.in.Days,as.numeric(Vital.Status.=='Dead')) ~ exprs(mirna)[i,])))$waldtest['pvalue'])
   })
 coxphFDR = p.adjust(coxphPval)
 ```
+
+
+
 
 ```{r results,cache=FALSE}
 library(DT)
@@ -29,3 +48,5 @@ df = data.frame(mirna = featureNames(mirna),
                      fdr = coxphFDR)
 datatable(df[!is.na(df$fdr),])
 ```
+
+
