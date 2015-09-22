@@ -7,6 +7,8 @@ output: html_document
 
 ```{r init}
 library(knitr)
+library(Biobase)
+library(survival)
 opts_chunk$set(cache=TRUE,warning=FALSE,message=FALSE)
 ```
 

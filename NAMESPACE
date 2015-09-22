@@ -3,3 +3,4 @@
 export(getClinical)
 export(getmiRNA)
 import(Biobase)
+importFrom(gdata,read.xls)

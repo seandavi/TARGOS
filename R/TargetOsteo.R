@@ -1,34 +1,40 @@
 options('DCC' = '/data/CCRBioinfo/projects/TargetOsteosarcoma/OtherData/DCC')
 
-#' Get TARGET clinical data (only 89 discovery samples) as a data frame
-#' 
+#' Get TARGET clinical data (only 89 discovery samples) as a data frame. The
+#' actual file used is "TARGET_OS_Discovery_Toronto_COG_89_FCCs_ClinicalData_7_29_2015_harmonized.xlsx".
+#'
 #' @param DCC The string location of the DCC directory
-#' 
+#'
+#' @importFrom gdata read.xls
+#'
 #' @export
 #' @examples
 #' clindf = getClinical()
 #' head(clindf)
 getClinical = function(DCC = options('DCC')) {
-  tmp = read.xls(file.path(DCC,'clinical/TARGET_OS_Discovery_Toronto_COG_89_FCCs_ClinicalData_7_29_2015_harmonized.xlsx'))
+  tmp = gdata::read.xls(file.path(DCC,'clinical/TARGET_OS_Discovery_Toronto_COG_89_FCCs_ClinicalData_7_29_2015_harmonized.xlsx'))
   rownames(tmp) = tmp$TARGET.USI
   return(tmp)
 }
 
 #' Get TARGET miRNA data (only 89 discovery samples) as an ExpressionSet
-#' 
-#' This function loads the miRNA data and does sample matching with 
-#' the clinical data (loaded using \code{\link{getClinical()}}).
-#' 
+#'
+#' This function loads the miRNA data and does sample matching with
+#' the clinical data (loaded using \code{\link{getClinical()}}). The
+#' actual file name used is "miRNA dCt values.txt". No further normalization
+#' is performed.
+#'
 #' @param DCC The string location of the DCC directory
-#' 
+#'
 #' @import Biobase
-#' 
+#' @importFrom gdata read.xls
+#'
 #' @export
-#' 
+#'
 #' @examples
 #' mirna = getmiRNA()
 #' mirna
-getmiRNA = function(DCC = options('DCC')) {
+getmiRNA = function(DCC = options('DCC'), hsaOnly=TRUE) {
   clindf = getClinical(DCC)
   tmp    = read.delim(file.path(DCC,'miRNA_pcr/L2/miRNA dCt values.txt'),check.names = FALSE)
   colnames(tmp)[1]='miRNA'
@@ -41,5 +47,10 @@ getmiRNA = function(DCC = options('DCC')) {
                     phenoData = AnnotatedDataFrame(clindf[matchingsamples,]))
   fData(e) = data.frame(miRNA = tmp[,1])
   featureNames(e) = rownames(tmpm)
+  if(hsaOnly) {
+    e = e[grepl('hsa',fData(e)[,1]),]
+  }
   return(e)
 }
+
+

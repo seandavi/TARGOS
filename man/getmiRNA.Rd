@@ -11,7 +11,9 @@ getmiRNA(DCC = options("DCC"))
 }
 \description{
 This function loads the miRNA data and does sample matching with
-the clinical data (loaded using \code{\link{getClinical()}}).
+the clinical data (loaded using \code{\link{getClinical()}}). The
+actual file name used is "miRNA dCt values.txt". No further normalization
+is performed.
 }
 \examples{
 mirna = getmiRNA()

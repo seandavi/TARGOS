@@ -2,7 +2,8 @@
 % Please edit documentation in R/TargetOsteo.R
 \name{getClinical}
 \alias{getClinical}
-\title{Get TARGET clinical data (only 89 discovery samples) as a data frame}
+\title{Get TARGET clinical data (only 89 discovery samples) as a data frame. The
+actual file used is "TARGET_OS_Discovery_Toronto_COG_89_FCCs_ClinicalData_7_29_2015_harmonized.xlsx".}
 \usage{
 getClinical(DCC = options("DCC"))
 }
@@ -10,7 +11,8 @@ getClinical(DCC = options("DCC"))
 \item{DCC}{The string location of the DCC directory}
 }
 \description{
-Get TARGET clinical data (only 89 discovery samples) as a data frame
+Get TARGET clinical data (only 89 discovery samples) as a data frame. The
+actual file used is "TARGET_OS_Discovery_Toronto_COG_89_FCCs_ClinicalData_7_29_2015_harmonized.xlsx".
 }
 \examples{
 clindf = getClinical()
