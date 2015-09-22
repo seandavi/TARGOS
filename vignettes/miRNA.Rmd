@@ -1,7 +1,7 @@
 ---
-title: "miRNA.html"
+title: "miRNA Analysis"
 author: "Sean Davis"
-date: "9/21/2015"
+date: "`r Sys.Date()`"
 output: html_document
 ---
 
@@ -19,7 +19,9 @@ options('DCC' = '/data/CCRBioinfo/projects/TargetOsteosarcoma/OtherData/DCC')
 mirna = getmiRNA()
 ```
 
-```{r metastasisAtPresentation,cache=FALSE}
+## Metastasis at presentation
+
+```{r metastasisAtPresentation}
 library(limma)
 met = factor(ifelse(pData(mirna)$Disease.at.diagnosis=='Metastatic',"Yes","No"))
 dm = model.matrix(~0 + met)
@@ -27,9 +29,13 @@ cm = makeContrasts(metYes-metNo,levels=dm)
 fit1 = lmFit(exprs(mirna),dm)
 fit2 = contrasts.fit(fit1,cm)
 fit3 = eBayes(fit2)
+```
+
+```{r reportMets,cache=FALSE}
 datatable(topTable(fit3,number=Inf))
 ```
 
+## Survival analysis
 
 ```{r coxph}
 coxphPval = sapply(seq_len(nrow(mirna)),function(i) {
@@ -37,8 +43,6 @@ coxphPval = sapply(seq_len(nrow(mirna)),function(i) {
   })
 coxphFDR = p.adjust(coxphPval)
 ```
-
-
 
 
 ```{r results,cache=FALSE}
