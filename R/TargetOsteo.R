@@ -17,7 +17,7 @@ getClinical = function(DCC = options('DCC')) {
   return(tmp)
 }
 
-#' Get TARGET miRNA data (only 89 discovery samples) as an ExpressionSet
+#' Get TARGET miRNA data (only discovery samples) as an ExpressionSet
 #'
 #' This function loads the miRNA data and does sample matching with
 #' the clinical data (loaded using \code{\link{getClinical()}}). The
@@ -51,6 +51,42 @@ getmiRNA = function(DCC = options('DCC'), hsaOnly=TRUE) {
     e = e[grepl('hsa',fData(e)[,1]),]
   }
   return(e)
+}
+
+#' Get TARGET methylation data (only discovery samples) as SummarizedExperiment
+#'
+#' This is a specialized function to read TARGET methylation data from the
+#' DCC repository structure and join it up with clinical data.  Use getAnnotation(obj)
+#' to get associated feature annotation.
+#'
+#' @param DCC The string location of the DCC directory
+#'
+#' @value A \link{\code{GenomicMethylSet-class}} (subclass of SummarizedExperiment)
+#'
+#' @import minfi
+#' @export
+#'
+#' @example
+#' \donotrun {
+#' methdat = getMethylation()
+#' }
+getMethylation = function(DCC=options('DCC'),normalization=preprocessIllumina) {
+  clin      = getClinical()
+  methpath  = file.path(DCC, 'methylation_array')
+  idatpath  = file.path(methpath, 'L1')
+  sdrfpath  = file.path(methpath, 'METADATA')
+  sdrf      = read.delim(file.path(sdrfpath, 'MAGE-TAB_TARGET_OS_Meth_Illumina_20140327.sdrf.txt'))
+  sdrf      = sdrf[sdrf$Label=='Cy3', ]
+  rownames(sdrf) = make.unique(as.character(sdrf[,1]))
+  olapsamps = intersect(clin$TARGET.USI, sdrf$Source.Name)
+  sdrf      = sdrf[olapsamps, ]
+  clin      = clin[olapsamps, ]
+  basenames = sdrf$Array.Data.File
+  names(basenames) = sdrf$Source.Name
+  dat = normalization(read.450k(file.path(idatpath,basenames)))
+  gset = mapToGenome(dat)
+  colData(gset) = DataFrame(clin)
+  return(gset)
 }
 
 
